@@ -1,4 +1,4 @@
-package com.github.want.camera;
+package com.github.want.camera.model;
 
 import java.io.Serializable;
 

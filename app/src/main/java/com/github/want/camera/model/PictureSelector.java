@@ -1,8 +1,9 @@
-package com.github.want.camera;
+package com.github.want.camera.model;
 
 import android.app.Activity;
 import android.content.Intent;
 
+import com.github.want.camera.CameraActivity;
 import com.github.want.camera.utils.DoubleUtils;
 
 import java.io.Serializable;
