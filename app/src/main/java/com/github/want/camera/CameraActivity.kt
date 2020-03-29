@@ -93,7 +93,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        recyclerView!!.layoutManager = linearLayoutManager
+        recyclerView.layoutManager = linearLayoutManager
         imageAdapter = ImageAdapter(this)
         imageAdapter.setDataList(photolist)
         recyclerView.adapter = imageAdapter
@@ -112,7 +112,6 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
                 }
             }
         })
-
     }
 
     private fun initView() {
@@ -164,7 +163,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
         mCamera?.run {
             this@CameraActivity.parameters = parameters
             this@CameraActivity.parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) //连续对焦
-            this.parameters = this@CameraActivity.parameters
+            parameters = this@CameraActivity.parameters
             startPreview()
             cancelAutoFocus()
         }
@@ -274,7 +273,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
         mCamera?.run {
             setPreviewCallback(null)
             stopPreview()
-            release()
+//            release()
         }
     }
 
@@ -282,6 +281,9 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
         handler.removeCallbacksAndMessages(null)
 //        releaseCamera()
         pictureSelector.reset()
+        mCamera?.run {
+            release()
+        }
         super.onDestroy()
     }
 

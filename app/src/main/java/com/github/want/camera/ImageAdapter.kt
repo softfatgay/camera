@@ -11,6 +11,7 @@ import com.github.want.camera.model.PictureModel
 import com.github.want.camera.utils.OnClickListener
 import com.github.want.camera.utils.RecyclerViewBaseAdapter
 import com.github.want.camera.utils.SuperViewHolder
+import org.jetbrains.annotations.NotNull
 
 class ImageAdapter(context: Context?) : RecyclerViewBaseAdapter<PictureModel?>(context) {
     private var photoSselect = 0
@@ -49,7 +50,7 @@ class ImageAdapter(context: Context?) : RecyclerViewBaseAdapter<PictureModel?>(c
     }
 
     private var clickListenner: OnClickListener? = null
-    fun setDeleteClickListenner(clickListenner: OnClickListener?) {
+    fun setDeleteClickListenner(@NotNull clickListenner: OnClickListener?) {
         this.clickListenner = clickListenner
     }
 
