@@ -5,5 +5,10 @@
 /.idea/libraries
 .DS_Store
 /build
+build
+gradle
+test
+androidTest
 /captures
 .externalNativeBuild
+.idea
