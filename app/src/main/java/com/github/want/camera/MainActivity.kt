@@ -37,6 +37,7 @@ class MainActivity : BasePictureActivity() {
                                     .takePhotoModel(1)
                                     .photolist(photolist)
                                     .enableAbum(true).builder(Constans.START_PHOTO_REQUEST_CODE)
+
                         }
                     }
         }

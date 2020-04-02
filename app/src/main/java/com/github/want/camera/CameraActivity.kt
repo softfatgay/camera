@@ -13,23 +13,31 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
-import android.widget.*
 import com.github.want.camera.model.PictureConfig
 import com.github.want.camera.model.PictureModel
 import com.github.want.camera.utils.CameraUtil
 import com.github.want.camera.utils.Constans
 import com.github.want.camera.utils.OnClickListener
 import com.github.want.camera.utils.StatusBarUtil
+import com.luck.picture.lib.compress.Luban
+import com.luck.picture.lib.config.PictureMimeType
+import com.luck.picture.lib.entity.LocalMedia
 import com.yalantis.ucrop.UCrop
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_camera.*
+import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("DEPRECATION")
 class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnClickListener {
-    private  var mCamera: Camera? = null
+    private var mCamera: Camera? = null
     private var cameraPosition = 0 //0代表前置摄像头,1代表后置摄像头,默认打开前置摄像头
     private lateinit var holder: SurfaceHolder
 
@@ -89,7 +97,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
     }
 
     var photolist = CopyOnWriteArrayList<PictureModel>()
-   lateinit var imageAdapter: ImageAdapter
+    lateinit var imageAdapter: ImageAdapter
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
@@ -98,7 +106,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
         imageAdapter.setDataList(photolist)
         recyclerView.adapter = imageAdapter
 
-        imageAdapter.setDeleteClickListenner(OnClickListener {position ->
+        imageAdapter.setDeleteClickListenner(OnClickListener { position ->
             val pictureModel = photolist[position]
             pictureModel.path = ""
             photolist[position] = pictureModel
@@ -357,15 +365,14 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
         when (v.id) {
             R.id.back -> finish()
             R.id.lookPictureIv -> {
-                //指定照片
                 for (pictureModel in photolist) {
                     if (TextUtils.isEmpty(pictureModel.path)) {
-                        Toast.makeText(this, "请完成拍照", Toast.LENGTH_SHORT).show()
                         return
                     }
                 }
                 setResult(Activity.RESULT_OK, Intent().putExtra(Constans.CALL_BACK_PHOTO_LIST, photolist))
                 finish()
+
             }
             R.id.takePhoto -> if (safeToTakePicture) {
                 safeToTakePicture = false
@@ -382,6 +389,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
             }
         }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {

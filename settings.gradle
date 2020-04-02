@@ -1,1 +1,1 @@
-include ':app', ':uc_lib'
+include ':app', ':uc_lib', ':library_picture'
