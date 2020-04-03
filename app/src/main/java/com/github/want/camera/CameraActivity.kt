@@ -202,7 +202,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
         if (mCamera == null) {
             mCamera = getCamera(cameraPosition)
         }
-        mCamera?.run {
+        mCamera.run {
             if (holder != null) {
                 startPreview(this, holder)
             }
@@ -256,7 +256,7 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
             camera = Camera.open(id)
         } catch (e: Exception) {
         }
-        return camera!!
+        return camera
     }
 
     /**
@@ -382,7 +382,12 @@ class CameraActivity : BasePictureActivity(), SurfaceHolder.Callback, View.OnCli
             R.id.cameraSwitch -> {
                 releaseCamera()
                 cameraPosition = (cameraPosition + 1) % Camera.getNumberOfCameras()
-                mCamera = getCamera(cameraPosition)!!
+                //切换摄像头，必须先释放掉camera，否则得到的是个空对象
+                mCamera?.release()
+                mCamera = null
+                if (mCamera == null) {
+                    mCamera = getCamera(cameraPosition)
+                }
                 if (holder != null) {
                     startPreview(mCamera, holder)
                 }

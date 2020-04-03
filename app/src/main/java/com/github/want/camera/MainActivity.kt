@@ -6,12 +6,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import com.github.want.camera.model.PictureModel
 import com.github.want.camera.model.PictureSelector
+import com.github.want.camera.utils.CameraUtil
 import com.github.want.camera.utils.Constans
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 import java.util.*
 
 class MainActivity : BasePictureActivity() {
@@ -79,6 +82,11 @@ class MainActivity : BasePictureActivity() {
             val model = PictureModel()
             val imgPath = getGalleryPhoto(uri)
             model.path = imgPath
+            val file = File(model.path)
+
+            val fileSize = CameraUtil.getFileSize(file)
+            Log.e("aaaaaa",fileSize.toString())
+
             photolist.add(model)
             setView(photolist)
         }
@@ -92,4 +100,8 @@ class MainActivity : BasePictureActivity() {
         imageAdapter.setDataList(photolist)
         recyclerView!!.adapter = imageAdapter
     }
+
+
+
+
 }
