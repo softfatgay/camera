@@ -49,7 +49,7 @@ public class MainActivity extends BasePictureActivity {
                                             .cameraType(1)
                                             .openLight(true)
                                             .enableCrop(false)
-                                            .takePhotoModel(0)
+                                            .takePhotoModel(1)
                                             .photolist(photolist)
                                             .enableAbum(true).builder(Constans.START_PHOTO_REQUEST_CODE);
 
