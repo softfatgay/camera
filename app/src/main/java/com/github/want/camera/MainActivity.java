@@ -70,25 +70,15 @@ public class MainActivity extends BasePictureActivity {
 
     private void setPhotoList(List<PictureModel> photolist) {
         photolist.clear();
-        PictureModel pictureModel = new PictureModel();
-        pictureModel.setName("车头");
-        pictureModel.setPath(null);
-        photolist.add(pictureModel);
 
-        PictureModel pictureModel1 = new PictureModel();
-        pictureModel1.setName("车尾");
-        pictureModel1.setPath(null);
-        photolist.add(pictureModel1);
+        for (int i = 0; i < 10; i++) {
+            PictureModel pictureModel = new PictureModel();
+            pictureModel.setName("第"+i+"张");
+            pictureModel.setPath(null);
+            photolist.add(pictureModel);
 
-        PictureModel pictureModel2 = new PictureModel();
-        pictureModel2.setName("车左侧");
-        pictureModel2.setPath(null);
-        photolist.add(pictureModel2);
+        }
 
-        PictureModel pictureModel3 = new PictureModel();
-        pictureModel3.setName("车右侧");
-        pictureModel3.setPath(null);
-        photolist.add(pictureModel3);
     }
 
     @Override
