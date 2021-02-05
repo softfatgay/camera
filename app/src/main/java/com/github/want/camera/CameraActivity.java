@@ -10,9 +10,6 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -22,6 +19,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.want.camera.utils.CameraUtil;
 import com.github.want.camera.utils.Constans;
@@ -473,8 +474,9 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+                if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case UCrop.REQUEST_CROP:
                     singleCropHandleResult(data);

@@ -5,8 +5,7 @@
     <SurfaceView
         android:id="@+id/my_surfaceView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-   />
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -25,8 +24,8 @@
                 android:id="@+id/openLight"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:padding="10dp"
                 android:background="@color/color_ffffff"
+                android:padding="10dp"
                 android:src="@drawable/camera_flash_off" />
 
             <TextView
@@ -40,14 +39,14 @@
             <ImageButton
                 android:id="@+id/cameraSwitch"
                 android:layout_width="30dp"
-                android:padding="10dp"
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
-                android:background="@mipmap/turn_off" />
+                android:background="@mipmap/turn_off"
+                android:padding="10dp" />
 
         </RelativeLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="70dp"
