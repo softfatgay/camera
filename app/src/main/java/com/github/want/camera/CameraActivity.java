@@ -5,16 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,6 +28,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cjt2325.cameralibrary.util.ScreenUtils;
+import com.github.want.camera.utils.CameraParamUtil;
 import com.github.want.camera.utils.CameraUtil;
 import com.github.want.camera.utils.Constans;
 import com.github.want.camera.utils.OnClickListener;
@@ -31,6 +37,8 @@ import com.github.want.camera.utils.StatusBarUtil;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -49,6 +57,7 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
     private Camera.Parameters parameters;
     private Handler handler = new Handler();
     boolean safeToTakePicture = true;
+    private double screenProp = 0f;
 
     /* 图像数据处理完成后的回调函数 */
     private Camera.PictureCallback mJpeg = new Camera.PictureCallback() {
@@ -69,8 +78,8 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
                                 matrix.preRotate(270);
                                 break;
                         }
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                        saveImage(getBaseContext(), bitmap);
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+                        saveImage(CameraActivity.this, bitmap);
                         mCamera.stopPreview();
                         mCamera.startPreview();
                     } catch (Exception e) {
@@ -82,6 +91,8 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
             }).start();
         }
     };
+
+
     //是否开启闪关灯按钮
     private boolean isOpenLight;
     //完成按钮
@@ -98,7 +109,7 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        CameraUtil.init(this);
+
         initView();
         initStatuBar();
         initData();
@@ -182,6 +193,16 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
                 }
             }
         });
+
+        if (screenProp == 0) {
+            int screenHeight = ScreenUtils.getScreenHeight(this);
+            int screenWidth = ScreenUtils.getScreenWidth(this);
+            Log.e(">>>>>>>>>>>>>>>", String.valueOf(screenHeight));
+            Log.e(">>>>>>>>>>>>>>>", String.valueOf(screenWidth));
+            double screenM = screenHeight /screenWidth;
+            screenProp =  screenM;
+            Log.e(">>>>>>>>>>>>>>>", String.valueOf(this.screenProp));
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -324,7 +345,7 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
      */
     private void startPreview(Camera camera, SurfaceHolder holder) {
         try {
-            setupCamera(camera);
+            setupCamera(camera, holder);
             camera.setPreviewDisplay(holder);
             //亲测的一个方法 基本覆盖所有手机 将预览矫正
             CameraUtil.getInstance().setCameraDisplayOrientation(this, cameraPosition, camera);
@@ -356,25 +377,84 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
     }
 
 
-    private void setupCamera(Camera camera) {
-        Camera.Parameters parameters = camera.getParameters();
+    private void setupCamera(Camera camera, SurfaceHolder holder) {
+        setStartPreview(camera, holder);
+    }
 
-        List<String> focusModes = parameters.getSupportedFocusModes();
-        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+    private int width;
+    private int height;
+
+    //启动相机浏览
+    private void setStartPreview(Camera camera, SurfaceHolder holder) {
+        try {
+            Camera.Parameters parameters = camera.getParameters();
+            parameters.setPictureFormat(ImageFormat.JPEG);
+            List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();//获取所有支持的camera尺寸
+            Iterator<Camera.Size> itor = sizeList.iterator();
+            while (itor.hasNext()) {
+                Log.e("//////////////////", "////////////////");
+                Camera.Size cur = itor.next();
+                Log.i("CJT", "所有的  width = " + cur.width + " height = " + cur.height);
+                if (cur.width >= width) {
+                    Log.e("=================", "=================");
+                    Log.i("=================", "width = " + cur.width + " height = " + cur.height);
+                    width = cur.width;
+                    height = (int) (width * screenProp);
+                    height = cur.height;
+                }
+            }
+
+
+            parameters.setPreviewSize(width, height);//把camera.size赋值到parameters
+            parameters.setPictureSize(width, height);
+            if (cameraPosition == 0) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
+
+            camera.setParameters(parameters);
+
+            camera.setPreviewDisplay(holder);
+            camera.setDisplayOrientation(90);
+            camera.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
-        Camera.Size previewSize = CameraUtil.findBestPreviewResolution(camera);
-        parameters.setPreviewSize(previewSize.width, previewSize.height);
 
-        Camera.Size pictrueSize = CameraUtil.getInstance().getPropPictureSize(parameters.getSupportedPictureSizes(), 1000);
-        parameters.setPictureSize(pictrueSize.width, pictrueSize.height);
-        camera.setParameters(parameters);
-//
-//        int picHeight = CameraUtil.screenWidth * previewSize.width / previewSize.height;
-//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(CameraUtil.screenWidth, picHeight);
+    private int cameraAngle = 90;//摄像头角度   默认为90度
+
+
+    private void setParameter() {
+        Camera.Parameters parameters = mCamera.getParameters(); // 获取各项参数
+        parameters.setPictureFormat(PixelFormat.JPEG); // 设置图片格式
+        parameters.setJpegQuality(70); // 设置照片质量
+        //获得相机支持的照片尺寸,选择合适的尺寸
+        List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+        int maxSize = Math.max(CameraUtil.screenWidth, CameraUtil.screenHeight);
+        int length = sizes.size();
+//        if (maxSize > 0) {
+//            for (int i = 0; i < length; i++) {
+//                if (maxSize <= Math.max(sizes.get(i).width, sizes.get(i).height)) {
+//                    parameters.setPictureSize(sizes.get(i).width, sizes.get(i).height);
+//                    break;
+//                }
+//            }
+//        }
+        List<Camera.Size> ShowSizes = parameters.getSupportedPreviewSizes();
+        int showLength = ShowSizes.size();
+        if (maxSize > 0) {
+            for (int i = 0; i < showLength; i++) {
+                if (maxSize <= Math.max(ShowSizes.get(i).width, ShowSizes.get(i).height)) {
+                    parameters.setPictureSize(ShowSizes.get(i).width, ShowSizes.get(i).height);
+                    parameters.setPreviewSize(ShowSizes.get(i).width, ShowSizes.get(i).height);
+                    break;
+                }
+            }
+        }
+        mCamera.setParameters(parameters);
+//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(CameraUtil.screenWidth, CameraUtil.screenWidth*4/3);
 //        mSurfaceView.setLayoutParams(params);
-
     }
 
     //将bitmap保存，然后通知图库更新
@@ -476,7 +556,7 @@ public class CameraActivity extends BasePictureActivity implements SurfaceHolder
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-                if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case UCrop.REQUEST_CROP:
                     singleCropHandleResult(data);

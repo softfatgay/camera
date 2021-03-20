@@ -6,11 +6,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.github.want.camera.utils.Constans;
 import com.tbruyelle.rxpermissions.RxPermissions;
 import com.yalantis.ucrop.UCrop;
@@ -23,6 +25,7 @@ import rx.functions.Action1;
 public class MainActivity extends BasePictureActivity {
     RxPermissions rxPermissions;
     private RecyclerView recyclerView;
+    private ImageView image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class MainActivity extends BasePictureActivity {
         final List<PictureModel> photolist = new ArrayList<>();
         Button cameraBtn = findViewById(R.id.cameraBtn);
         Button abulyBtn = findViewById(R.id.abulyBtn);
+        image = findViewById(R.id.image);
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,6 +115,7 @@ public class MainActivity extends BasePictureActivity {
         imageAdapter.setDataList(photolist);
         recyclerView.setAdapter(imageAdapter);
 
+        Glide.with(this).load(photolist.get(0).getPath()).into(image);
     }
 
 }
